@@ -1,16 +1,15 @@
 """
 Excel Spreadsheet (.xlsx) Extractor.
-Extracts multiple worksheets, table matrices, preserved strings (identifiers with leading zeros),
-and cached formula results using openpyxl in read-only mode without code/macro execution.
+Extracts multiple worksheets, table grids, headers, and cell values.
+Uses read-only and data-only modes in openpyxl to never execute formulas or VBA macros,
+while safely checking for uncalculated formula error values.
 """
 
 import io
 import zipfile
 from typing import Union, Optional, Tuple, List, Dict, Any
 
-# pyrefly: ignore [missing-import]
 from ..contracts import ExtractionResult, ExtractionStatus, DocumentBlock, TableBlock, BlockType
-# pyrefly: ignore [missing-import]
 from ..exceptions import (
     ExtractionException,
     EmptyFileException,
@@ -25,10 +24,12 @@ try:
 except ImportError:
     HAS_OPENPYXL = False
 
+EXCEL_ERROR_VALUES = {"#NULL!", "#DIV/0!", "#VALUE!", "#REF!", "#NAME?", "#NUM!", "#N/A"}
+
 
 class XlsxExtractor(BaseExtractor):
     """
-    Extracts structured tabular data across multiple worksheets from Excel (.xlsx) files.
+    Extracts tabular data from Microsoft Excel (.xlsx) files across all worksheets.
     """
 
     def extract(self, file_source: Union[str, bytes], filename: Optional[str] = None) -> ExtractionResult:
@@ -36,7 +37,7 @@ class XlsxExtractor(BaseExtractor):
             return self._create_failed_result(
                 "xlsx",
                 "DEPENDENCY_MISSING",
-                "openpyxl package is required for Excel extraction but not installed",
+                "openpyxl library is required for XLSX extraction",
             )
 
         try:
@@ -50,7 +51,7 @@ class XlsxExtractor(BaseExtractor):
 
         effective_filename = filename or source_filename or "workbook.xlsx"
 
-        # 1. Zip Bomb Defense
+        # 1. Zip Bomb Defense (Enforced before openpyxl parsing)
         try:
             self._check_zip_bomb(raw_bytes)
         except ExtractionException as e:
@@ -75,7 +76,7 @@ class XlsxExtractor(BaseExtractor):
         if has_macros:
             warnings.append("Workbook contains VBA macros (.xlsm/vbaProject.bin); macros were NOT executed")
 
-        # 3. Load Workbook in Read-Only Data-Only Mode (fetching cached formula values)
+        # 3. Load Workbook in Read-Only Data-Only Mode (never executes formulas, extracts cached values)
         try:
             wb = openpyxl.load_workbook(
                 io.BytesIO(raw_bytes),
@@ -97,6 +98,8 @@ class XlsxExtractor(BaseExtractor):
         total_rows_extracted = 0
         total_cells_extracted = 0
         empty_sheets_count = 0
+        has_formula_errors = False
+        formula_error_occurrences: List[str] = []
 
         try:
             sheet_names = wb.sheetnames
@@ -108,14 +111,19 @@ class XlsxExtractor(BaseExtractor):
                     warnings.append(f"Worksheet '{sheet_name}' is hidden in workbook")
 
                 rows_data: List[List[str]] = []
-                # Traverse rows safely
                 for row in sheet.iter_rows(values_only=True):
-                    # Check if row is entirely None or empty strings
                     if not row or all(v is None or str(v).strip() == "" for v in row):
                         continue
 
-                    # Preserve string fidelity (especially identifiers, product codes with leading zeros)
-                    formatted_row = [self._format_cell_value(val) for val in row]
+                    formatted_row: List[str] = []
+                    for val in row:
+                        cell_str = self._format_cell_value(val)
+                        if cell_str in EXCEL_ERROR_VALUES:
+                            has_formula_errors = True
+                            if cell_str not in formula_error_occurrences:
+                                formula_error_occurrences.append(cell_str)
+                        formatted_row.append(cell_str)
+
                     # Trim trailing empty cells from row
                     while formatted_row and formatted_row[-1] == "":
                         formatted_row.pop()
@@ -133,8 +141,6 @@ class XlsxExtractor(BaseExtractor):
                     })
                     continue
 
-                order += 1
-                # Worksheet Header Block
                 order += 1
                 headers = rows_data[0] if rows_data else []
                 data_rows = rows_data[1:] if len(rows_data) > 1 else []
@@ -189,6 +195,11 @@ class XlsxExtractor(BaseExtractor):
         if empty_sheets_count > 0:
             warnings.append(f"{empty_sheets_count} worksheet(s) were empty and contained no data")
 
+        if has_formula_errors:
+            warnings.append(
+                f"Worksheet contains uncalculated formulas or Excel error values ({', '.join(formula_error_occurrences)})"
+            )
+
         # 5. Assemble Content and Stats
         content, stats = self._assemble_content_and_stats(
             blocks,
@@ -206,9 +217,14 @@ class XlsxExtractor(BaseExtractor):
             "hidden_sheets": hidden_sheets,
             "sheet_summaries": sheet_summaries,
             "filename": effective_filename,
+            "has_formula_errors": has_formula_errors,
         }
 
-        status = ExtractionStatus.SUCCESS_WITH_WARNINGS if warnings else ExtractionStatus.SUCCESS
+        status = ExtractionStatus.SUCCESS
+        if has_formula_errors:
+            status = ExtractionStatus.NEEDS_REVIEW
+        elif warnings:
+            status = ExtractionStatus.SUCCESS_WITH_WARNINGS
 
         return ExtractionResult(
             status=status,
@@ -227,11 +243,9 @@ class XlsxExtractor(BaseExtractor):
         if isinstance(val, str):
             return val.strip()
         if isinstance(val, (int, float)):
-            # Retain integer formatting if no fractional part
             if isinstance(val, float) and val.is_integer():
                 return str(int(val))
             return str(val)
         if hasattr(val, "strftime"):
-            # Date / Datetime
             return val.strftime("%Y-%m-%d %H:%M:%S" if hasattr(val, "hour") else "%Y-%m-%d")
         return str(val).strip()

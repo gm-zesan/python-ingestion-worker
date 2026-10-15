@@ -4,6 +4,8 @@ Covers: Headings hierarchy, paragraphs, table grids with headers,
 reading order preservation, empty files, malformed archives, zip bomb safety.
 """
 
+import io
+import zipfile
 import unittest
 from app.contracts import ExtractionStatus, BlockType
 from app.extractors.docx_extractor import DocxExtractor
@@ -63,7 +65,7 @@ class TestDocxExtractor(unittest.TestCase):
 
     def test_bengali_unicode_in_docx(self):
         headings = [(1, "ফেরত নীতিমালা (Return Policy)")]
-        paragraphs = ["৭ দিনের মধ্যে ক্যাশ অন ডেলিভারি পণ্যের রিফান্ড দাবি করুন।"]
+        paragraphs = ["৭ দিনের মধ্যে ক্যাশ অন ডেলিভারি পণ্যের রিফンダント দাবি করুন।"]
         docx_bytes = create_synthetic_docx_bytes(paragraphs=paragraphs, headings=headings)
         result = self.extractor.extract(docx_bytes, filename="bengali.docx")
 
@@ -82,7 +84,6 @@ class TestDocxExtractor(unittest.TestCase):
         self.assertEqual(result.error_code, "CORRUPTED_FILE")
 
     def test_zip_without_document_xml_fails(self):
-        import io, zipfile
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, "w") as z:
             z.writestr("some_other_file.txt", "data")
@@ -90,6 +91,13 @@ class TestDocxExtractor(unittest.TestCase):
         self.assertEqual(result.status, ExtractionStatus.FAILED)
         self.assertEqual(result.error_code, "CORRUPTED_FILE")
 
+    def test_malformed_document_xml_fails_cleanly(self):
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as z:
+            z.writestr("word/document.xml", "<w:document><broken_xml_no_closing>")
+        result = self.extractor.extract(buf.getvalue(), filename="broken_xml.docx")
+        self.assertEqual(result.status, ExtractionStatus.FAILED)
+        self.assertEqual(result.error_code, "CORRUPTED_FILE")
 
     def test_interleaved_reading_order(self):
         # Test interleaved reading order: Heading -> Para -> Table

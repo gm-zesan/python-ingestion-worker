@@ -38,7 +38,6 @@ class TestXlsxExtractor(unittest.TestCase):
         self.assertIn("Products", result.metadata["sheet_names"])
         self.assertIn("Shipping", result.metadata["sheet_names"])
 
-        # Check extracted table blocks
         table_blocks = [b for b in result.blocks if b.block_type == BlockType.TABLE]
         self.assertEqual(len(table_blocks), 2)
         self.assertEqual(table_blocks[0].headers, ["SKU", "Product Name", "Price (BDT)"])
@@ -62,6 +61,22 @@ class TestXlsxExtractor(unittest.TestCase):
         self.assertIn("01712345678", result.content)
         self.assertIn("0120", result.content)
 
+    def test_formula_error_values_trigger_needs_review(self):
+        sheets = {
+            "Financials": [
+                ["Item", "Calculated Total"],
+                ["Revenue", "#VALUE!"],
+                ["Tax", "#REF!"],
+            ]
+        }
+        xlsx_bytes = create_synthetic_xlsx_bytes(sheets)
+        result = self.extractor.extract(xlsx_bytes, filename="financials.xlsx")
+
+        # Unresolved formula errors should mark result as NEEDS_REVIEW
+        self.assertEqual(result.status, ExtractionStatus.NEEDS_REVIEW)
+        self.assertTrue(result.metadata["has_formula_errors"])
+        self.assertTrue(any("uncalculated formulas or Excel error values" in w for w in result.warnings))
+
     def test_hidden_sheet_reporting(self):
         sheets = {
             "PublicData": [
@@ -76,7 +91,6 @@ class TestXlsxExtractor(unittest.TestCase):
         xlsx_bytes = create_synthetic_xlsx_bytes(sheets, hidden_sheets=["InternalCosts"])
         result = self.extractor.extract(xlsx_bytes, filename="costs.xlsx")
 
-        # Hidden sheets should trigger success_with_warnings and be recorded in metadata
         self.assertEqual(result.status, ExtractionStatus.SUCCESS_WITH_WARNINGS)
         self.assertIn("InternalCosts", result.metadata["hidden_sheets"])
         self.assertTrue(any("hidden in workbook" in w for w in result.warnings))

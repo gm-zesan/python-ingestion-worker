@@ -46,9 +46,29 @@ class TestTxtExtractor(unittest.TestCase):
         self.assertIn("৳ ১২০", result.content)
         self.assertEqual(len(result.blocks), 2)
 
+    def test_bengali_unicode_zwj_and_zwnj_preservation(self):
+        # Explicit test for Zero Width Joiner (\u200D) and Zero Width Non-Joiner (\u200C)
+        zwj_word = "র\u200d্যাপিড"      # Bengali ya-phala with ZWJ
+        zwnj_word = "ক্\u200cষ"         # Explicit non-ligature with ZWNJ
+        content = f"সংযুক্ত শব্দ ১: {zwj_word}\n\nসংযুক্ত শব্দ ২: {zwnj_word}"
+
+        result = self.extractor.extract(content.encode("utf-8"), filename="bengali_zwj.txt")
+        self.assertEqual(result.status, ExtractionStatus.SUCCESS)
+        self.assertIn("\u200d", result.content, "ZWJ character must be preserved without stripping")
+        self.assertIn("\u200c", result.content, "ZWNJ character must be preserved without stripping")
+        self.assertIn(zwj_word, result.blocks[0].text)
+        self.assertIn(zwnj_word, result.blocks[1].text)
+
+    def test_undecodable_binary_fails_cleanly_without_silent_corruption(self):
+        # Random non-ASCII binary sequence with unmapped control characters
+        raw_bytes = b"\x81\x8d\x8f\x90\x9d\x01\x02\x03\x04\x05\x06\x07\x08"
+        result = self.extractor.extract(raw_bytes, filename="binary.txt")
+        self.assertEqual(result.status, ExtractionStatus.FAILED)
+        self.assertEqual(result.error_code, "DECODING_FAILURE")
+        self.assertEqual(result.content, "")
+
     def test_legacy_windows_1252_encoding(self):
         # Windows-1252 specific byte sequence (smart quotes, em-dash: \x93, \x94, \x97)
-        # "Hello" with smart quotes and em-dash
         raw_bytes = b"Special \x93quoted\x94 term \x97 legacy file."
         result = self.extractor.extract(raw_bytes, filename="legacy.txt")
         self.assertTrue(result.is_successful)

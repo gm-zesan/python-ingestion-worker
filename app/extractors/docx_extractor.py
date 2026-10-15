@@ -11,9 +11,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 from typing import Union, Optional, Tuple, List, Dict, Any
 
-# pyrefly: ignore [missing-import]
 from ..contracts import ExtractionResult, ExtractionStatus, DocumentBlock, TableBlock, BlockType
-# pyrefly: ignore [missing-import]
 from ..exceptions import (
     ExtractionException,
     EmptyFileException,
@@ -79,7 +77,7 @@ class DocxExtractor(BaseExtractor):
                 # Check for images and embedded objects
                 image_files = [n for n in namelist if n.startswith("word/media/")]
                 embedded_files = [n for n in namelist if n.startswith("word/embeddings/")]
-        except zipfile.BadZipFile as e:
+        except zipfile.BadZipFile:
             return self._create_failed_result("docx", "CORRUPTED_FILE", "Malformed DOCX zip archive")
 
         warnings: List[str] = []
@@ -89,14 +87,23 @@ class DocxExtractor(BaseExtractor):
             warnings.append(f"Document contains {len(embedded_files)} embedded object(s) which were not extracted")
 
         # 3. Extract Blocks (Headings, Paragraphs, Tables in sequential reading order)
+        blocks: List[DocumentBlock] = []
+        metadata: Dict[str, Any] = {}
+
         if HAS_PYTHON_DOCX:
             try:
                 blocks, metadata = self._extract_via_python_docx(raw_bytes, warnings)
             except Exception as e:
                 warnings.append(f"python-docx encountered an issue ({str(e)}), falling back to XML extraction")
-                blocks, metadata = self._extract_via_xml(raw_bytes, warnings)
+                try:
+                    blocks, metadata = self._extract_via_xml(raw_bytes, warnings)
+                except (ET.ParseError, CorruptedFileException):
+                    return self._create_failed_result("docx", "CORRUPTED_FILE", "Malformed document.xml XML content in DOCX")
         else:
-            blocks, metadata = self._extract_via_xml(raw_bytes, warnings)
+            try:
+                blocks, metadata = self._extract_via_xml(raw_bytes, warnings)
+            except (ET.ParseError, CorruptedFileException):
+                return self._create_failed_result("docx", "CORRUPTED_FILE", "Malformed document.xml XML content in DOCX")
 
         metadata["image_count"] = len(image_files)
         metadata["embedded_object_count"] = len(embedded_files)
@@ -215,10 +222,13 @@ class DocxExtractor(BaseExtractor):
 
     def _extract_via_xml(self, raw_bytes: bytes, warnings: List[str]) -> Tuple[List[DocumentBlock], Dict[str, Any]]:
         """Fallback extractor using native xml.etree.ElementTree on word/document.xml."""
-        with zipfile.ZipFile(io.BytesIO(raw_bytes)) as z:
-            xml_bytes = z.read("word/document.xml")
+        try:
+            with zipfile.ZipFile(io.BytesIO(raw_bytes)) as z:
+                xml_bytes = z.read("word/document.xml")
+            root = ET.fromstring(xml_bytes)
+        except ET.ParseError as e:
+            raise CorruptedFileException("Malformed XML in word/document.xml") from e
 
-        root = ET.fromstring(xml_bytes)
         body = root.find(f"{{{W_NS}}}body")
         if body is None:
             return [], {"extractor": "xml_fallback", "heading_count": 0, "paragraph_count": 0, "table_count": 0}
@@ -267,13 +277,17 @@ class DocxExtractor(BaseExtractor):
                     )
 
             elif tag == f"{{{W_NS}}}tbl":
-                # Table
+                # Table in sequential reading order
                 table_matrix = []
                 for row_elem in child.findall(f"{{{W_NS}}}tr"):
                     row_cells = []
                     for cell_elem in row_elem.findall(f"{{{W_NS}}}tc"):
-                        cell_runs = [t.text for t in cell_elem.iter(f"{{{W_NS}}}t") if t.text]
-                        cell_text = "".join(cell_runs).strip().replace("\n", " ")
+                        p_texts = []
+                        for p in cell_elem.findall(f"{{{W_NS}}}p"):
+                            pt = "".join(t.text for t in p.iter(f"{{{W_NS}}}t") if t.text).strip()
+                            if pt:
+                                p_texts.append(pt)
+                        cell_text = " ".join(p_texts)
                         row_cells.append(cell_text)
                     table_matrix.append(row_cells)
 

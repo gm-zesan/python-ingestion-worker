@@ -56,6 +56,16 @@ class TestCsvExtractor(unittest.TestCase):
         self.assertEqual(table.rows[0][1], "Refund for order, item damaged")
         self.assertIn("Multiline note", table.rows[1][1])
 
+    def test_inert_formula_text_not_evaluated_in_csv(self):
+        # CSV injection style strings: =SUM(...) or =cmd|' /C calc'!A0 must remain harmless literal text
+        csv_text = "Formula,Target\n=SUM(A1:A10),Sales\n=cmd|' /C calc'!A0,Threat\n"
+        result = self.extractor.extract(csv_text.encode("utf-8"), filename="formulas.csv")
+        self.assertEqual(result.status, ExtractionStatus.SUCCESS)
+        table = result.blocks[0]
+        self.assertEqual(table.rows[0][0], "=SUM(A1:A10)")
+        self.assertEqual(table.rows[1][0], "=cmd|' /C calc'!A0")
+        self.assertIn("=SUM(A1:A10)", result.content)
+
     def test_utf8_with_bom_csv(self):
         csv_text = "\ufeffCategory,Discount\nElectronics,10%\nFashion,15%\n"
         result = self.extractor.extract(csv_text.encode("utf-8-sig"), filename="promo.csv")
@@ -92,7 +102,6 @@ class TestCsvExtractor(unittest.TestCase):
         result = self.extractor.extract(b"", filename="empty.csv")
         self.assertEqual(result.status, ExtractionStatus.FAILED)
         self.assertEqual(result.error_code, "FILE_EMPTY")
-
 
     def test_pipe_delimiter(self):
         csv_text = "SKU|Name|Price\nP101|Earbuds|1500\nP102|Adapter|500\n"

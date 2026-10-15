@@ -1,7 +1,7 @@
 """
-Comma-Separated Values (.csv) Extractor.
-Uses standard library csv, conservative dialect probing, quoted field handling,
-BOM detection, and jagged row validation without formula execution.
+Comma-Separated Values (.csv, .tsv) Extractor.
+Extracts tabular data with conservative delimiter probing, header detection,
+quoted content parsing, and encoding normalization.
 """
 
 import io
@@ -9,9 +9,7 @@ import csv
 import unicodedata
 from typing import Union, Optional, Tuple, List, Dict, Any
 
-# pyrefly: ignore [missing-import]
 from ..contracts import ExtractionResult, ExtractionStatus, DocumentBlock, TableBlock, BlockType
-# pyrefly: ignore [missing-import]
 from ..exceptions import (
     ExtractionException,
     EmptyFileException,
@@ -30,7 +28,7 @@ except ImportError:
 
 class CsvExtractor(BaseExtractor):
     """
-    Extracts tabular data from CSV, TSV, and DSV files.
+    Extracts structured tabular data from CSV and TSV files.
     """
 
     ALLOWED_DELIMITERS = [",", "\t", ";", "|"]
@@ -48,7 +46,7 @@ class CsvExtractor(BaseExtractor):
         effective_filename = filename or source_filename or "data.csv"
         warnings: List[str] = []
 
-        # 1. Decode text with BOM detection
+        # 1. Decode Bytes with Encoding Fallbacks
         text, encoding, has_bom = self._decode_csv_bytes(raw_bytes, warnings)
         if text is None or not text.strip():
             return self._create_failed_result(
@@ -194,7 +192,7 @@ class CsvExtractor(BaseExtractor):
         if HAS_CHARSET_NORMALIZER:
             try:
                 best = charset_normalizer.from_bytes(raw_bytes).best()
-                if best is not None:
+                if best is not None and getattr(best, "chaos", 0.0) <= 0.30:
                     return str(best), best.encoding or "unknown", False
             except Exception:
                 pass
@@ -202,8 +200,10 @@ class CsvExtractor(BaseExtractor):
         for enc in ["windows-1252", "iso-8859-1"]:
             try:
                 decoded = raw_bytes.decode(enc)
-                warnings.append(f"Decoded CSV using legacy encoding '{enc}'")
-                return decoded, enc, False
+                c1_controls = sum(1 for ch in decoded if 0x80 <= ord(ch) <= 0x9F)
+                if c1_controls == 0:
+                    warnings.append(f"Decoded CSV using legacy encoding '{enc}'")
+                    return decoded, enc, False
             except UnicodeDecodeError:
                 continue
 
@@ -246,7 +246,6 @@ class CsvExtractor(BaseExtractor):
         if any(cell == "" for cell in first_row):
             return False
 
-        # If first row contains numbers where second row also contains numbers, likely data
         def is_numeric(s: str) -> bool:
             return s.replace(".", "", 1).replace(",", "", 1).replace("-", "", 1).isdigit()
 

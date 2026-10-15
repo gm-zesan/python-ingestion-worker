@@ -6,19 +6,29 @@ Prevents leaking absolute filesystem paths, internal stack traces, or credential
 import re
 from typing import Optional
 
-# Pattern matching absolute filesystem paths in Unix and Windows systems
-PATH_PATTERN = re.compile(r"(\/[a-zA-Z0-9_\-\.]+)+|\b[a-zA-Z]:\\[a-zA-Z0-9_\-\.\\]+")
+# Pattern matching paths including spaces, POSIX, and Windows
+PATH_PATTERN = re.compile(
+    r"(\/(?:Users|home|var|tmp|etc|usr|opt|private|[a-zA-Z0-9_\-\.]+)\/[a-zA-Z0-9_\-\.\/ ]+)"
+    r"|(\b[a-zA-Z]:\\[a-zA-Z0-9_\-\.\ \\]+)"
+)
+
+# Pattern matching potential secrets / credentials in logs or errors
+SECRET_PATTERN = re.compile(
+    r"(?i)\b(bearer|token|secret|password|api[_\-]?key|auth)[\s:=]+(['\"]?[a-zA-Z0-9_\-\.]{8,}['\"]?)"
+)
 
 
 def sanitize_error_message(message: str) -> str:
-    """Removes absolute paths and internal system details from error messages."""
+    """Removes absolute paths, secrets, and internal system details from error messages."""
     if not message:
         return ""
+    # Mask secrets first
+    sanitized = SECRET_PATTERN.sub(r"\1: [REDACTED]", message)
     # Mask full filesystem paths
-    sanitized = PATH_PATTERN.sub("[FILE_PATH]", message)
-    # Remove user home references
-    sanitized = re.sub(r"/Users/[^/\s]+", "[USER_DIR]", sanitized)
-    sanitized = re.sub(r"/home/[^/\s]+", "[USER_DIR]", sanitized)
+    sanitized = PATH_PATTERN.sub("[FILE_PATH]", sanitized)
+    # Catch any remaining /Users/ or /home/ references
+    sanitized = re.sub(r"/Users/[^/\s'\"]+", "[USER_DIR]", sanitized)
+    sanitized = re.sub(r"/home/[^/\s'\"]+", "[USER_DIR]", sanitized)
     return sanitized.strip()
 
 
