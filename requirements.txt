@@ -1,0 +1,14 @@
+# Dedicated Ingestion Worker Dependencies
+# Pinned versions for isolated document extraction worker (Phase 2A)
+
+# Tabular spreadsheet extraction
+openpyxl==3.1.5
+
+# Word document extraction
+python-docx==1.1.2
+
+# Universal encoding detection (legacy TXT support)
+charset-normalizer==3.4.1
+
+# Testing & quality
+pytest==8.3.4
