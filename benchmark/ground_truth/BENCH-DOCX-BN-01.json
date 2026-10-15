@@ -1,0 +1,40 @@
+{
+  "fixture_id": "BENCH-DOCX-BN-01",
+  "filename": "BENCH-DOCX-BN-01.docx",
+  "format": "docx",
+  "category": "multilingual",
+  "scenario": "Bengali DOCX policy with complex Bengali script",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "পণ্য ফেরত ও রিফান্ড নীতিমালা\n\nপণ্য হাতে পাওয়ার ৭ দিনের মধ্যে ফেরত পাঠানোর অনুরোধ জানাতে হবে।\n\nত্রুটিপূর্ণ পণ্যের ক্ষেত্রে সম্পূর্ণ মূল্য ফেরত প্রদান করা হবে।",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "heading",
+      "level": 1,
+      "text": "পণ্য ফেরত ও রিফান্ড নীতিমালা"
+    },
+    {
+      "block_type": "paragraph",
+      "text": "পণ্য হাতে পাওয়ার ৭ দিনের মধ্যে ফেরত পাঠানোর অনুরোধ জানাতে হবে।"
+    },
+    {
+      "block_type": "paragraph",
+      "text": "ত্রুটিপূর্ণ পণ্যের ক্ষেত্রে সম্পূর্ণ মূল্য ফেরত প্রদান করা হবে।"
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

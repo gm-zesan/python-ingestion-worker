@@ -1,0 +1,46 @@
+{
+  "fixture_id": "BENCH-XLSX-FORMULA-01",
+  "filename": "BENCH-XLSX-FORMULA-01.xlsx",
+  "format": "xlsx",
+  "category": "edge_cases",
+  "scenario": "Worksheet containing uncalculated formula error tokens",
+  "expected_status": "needs_review",
+  "accepted_statuses": [
+    "needs_review"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [
+    "uncalculated formulas or Excel error values"
+  ],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: Sheet: Financials]\nMetric | Calculation\n-----------------------\nNet Margin | #VALUE!",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "sheet_name": "Financials",
+      "headers": [
+        "Metric",
+        "Calculation"
+      ],
+      "rows": [
+        [
+          "Net Margin",
+          "#VALUE!"
+        ]
+      ],
+      "row_count": 1
+    }
+  ],
+  "expected_metadata": {
+    "has_formula_errors": true
+  },
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

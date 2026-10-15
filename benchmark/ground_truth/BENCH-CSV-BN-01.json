@@ -1,0 +1,54 @@
+{
+  "fixture_id": "BENCH-CSV-BN-01",
+  "filename": "BENCH-CSV-BN-01.csv",
+  "format": "csv",
+  "category": "multilingual",
+  "scenario": "Bengali CSV encoded in UTF-8 with Byte Order Mark",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: BENCH-CSV-BN-01.csv]\nপণ্যের আইডি | পণ্যের নাম | মূল্য | স্ট্যাটাস\n-----------------------------------------------\nBN-01 | পাঞ্জাবি | ১২০০ | উপলব্ধ\nBN-02 | পায়জামা | ৪৫০ | উপলব্ধ",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "headers": [
+        "পণ্যের আইডি",
+        "পণ্যের নাম",
+        "মূল্য",
+        "স্ট্যাটাস"
+      ],
+      "rows": [
+        [
+          "BN-01",
+          "পাঞ্জাবি",
+          "১২০০",
+          "উপলব্ধ"
+        ],
+        [
+          "BN-02",
+          "পায়জামা",
+          "৪৫০",
+          "উপলব্ধ"
+        ]
+      ],
+      "row_count": 2
+    }
+  ],
+  "expected_metadata": {
+    "encoding": "utf-8-sig",
+    "has_bom": true
+  },
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

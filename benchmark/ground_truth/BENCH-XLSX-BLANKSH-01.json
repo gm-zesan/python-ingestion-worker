@@ -1,0 +1,50 @@
+{
+  "fixture_id": "BENCH-XLSX-BLANKSH-01",
+  "filename": "BENCH-XLSX-BLANKSH-01.xlsx",
+  "format": "xlsx",
+  "category": "edge_cases",
+  "scenario": "Workbook containing one populated sheet and one empty sheet",
+  "expected_status": "success_with_warnings",
+  "accepted_statuses": [
+    "success_with_warnings"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [
+    "empty and contained no data"
+  ],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: Sheet: ActiveData]\nKey | Val\n--------------------\nK1 | V1",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "sheet_name": "ActiveData",
+      "headers": [
+        "Key",
+        "Val"
+      ],
+      "rows": [
+        [
+          "K1",
+          "V1"
+        ]
+      ],
+      "row_count": 1
+    }
+  ],
+  "expected_metadata": {
+    "sheet_names": [
+      "ActiveData",
+      "BlankSheet"
+    ],
+    "sheet_count": 2
+  },
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

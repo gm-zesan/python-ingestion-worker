@@ -1,0 +1,42 @@
+{
+  "fixture_id": "BENCH-XLSX-UNCACHED-01",
+  "filename": "BENCH-XLSX-UNCACHED-01.xlsx",
+  "format": "xlsx",
+  "category": "edge_cases",
+  "scenario": "Uncalculated Excel formula without pre-cached evaluated value in file",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: Sheet: UncachedFormulas]\nItem | FormulaVal\n--------------------\nTotal | ",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "sheet_name": "UncachedFormulas",
+      "headers": [
+        "Item",
+        "FormulaVal"
+      ],
+      "rows": [
+        [
+          "Total",
+          ""
+        ]
+      ],
+      "row_count": 1
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": "openpyxl read-only data-only mode does not execute formulas; uncached formulas yield empty cell"
+}

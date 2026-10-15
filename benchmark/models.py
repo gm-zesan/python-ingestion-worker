@@ -29,9 +29,11 @@ class GroundTruth:
     expected_status: str
     accepted_statuses: List[str] = field(default_factory=list)
     expected_error_code: Optional[str] = None
+    allow_any_error_code: bool = False
     expected_warnings: List[str] = field(default_factory=list)
     forbidden_warnings: List[str] = field(default_factory=list)
     expected_text: str = ""
+    text_applicable: Optional[bool] = None
     expected_blocks: List[Dict[str, Any]] = field(default_factory=list)
     expected_metadata: Dict[str, Any] = field(default_factory=dict)
     provisional_thresholds: Dict[str, Any] = field(default_factory=lambda: {
@@ -39,10 +41,15 @@ class GroundTruth:
         "min_car": 1.00,
         "require_exact_structure": True,
     })
+    threshold_rationale: Optional[str] = None
+    known_unsupported_content: Optional[str] = None
 
     def __post_init__(self):
         if not self.accepted_statuses and self.expected_status:
             self.accepted_statuses = [self.expected_status]
+        if self.text_applicable is None:
+            # By contract, negative/failed extractions do not evaluate text similarity
+            self.text_applicable = (self.expected_status != "failed")
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -65,9 +72,10 @@ class FixtureEvaluationResult:
     error_code_match: bool
     actual_error_code: Optional[str] = None
     expected_error_code: Optional[str] = None
-    cer: float = 0.0
-    car: float = 1.0
-    levenshtein_distance: int = 0
+    text_applicable: bool = True
+    cer: Optional[float] = None
+    car: Optional[float] = None
+    levenshtein_distance: Optional[int] = None
     structure_match: bool = True
     structural_score: float = 1.0
     structure_mismatches: List[str] = field(default_factory=list)
@@ -79,6 +87,7 @@ class FixtureEvaluationResult:
     execution_time_ms: float = 0.0
     extracted_text_preview: str = ""
     expected_text_preview: str = ""
+    failure_reasons: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -92,10 +101,14 @@ class FormatSummary:
     passed_fixtures: int
     failed_fixtures: int
     pass_rate: float
-    mean_car: float
-    mean_cer: float
+    text_applicable_count: int
+    mean_car: Optional[float]
+    mean_cer: Optional[float]
+    exact_structure_pass_count: int
     mean_structural_score: float
+    warnings_passed_count: int
     mean_execution_time_ms: float
+    failed_fixture_ids: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -108,14 +121,24 @@ class BenchmarkReport:
     passed_fixtures: int
     failed_fixtures: int
     overall_pass_rate: float
-    overall_car: float
-    overall_verdict: str
+    total_text_applicable: int
+    overall_car: Optional[float]
+    overall_cer: Optional[float]
+    overall_verdict: str  # "PASSED" or "DEFECTS_EXPOSED"
     format_summaries: Dict[str, FormatSummary]
+    scenario_metrics: Dict[str, Dict[str, Any]]
     results: List[FixtureEvaluationResult]
+    execution_time_ms: float
     timestamp: str
 
     def to_dict(self) -> Dict[str, Any]:
         data = asdict(self)
-        data["format_summaries"] = {k: v.to_dict() if hasattr(v, "to_dict") else v for k, v in self.format_summaries.items()}
-        data["results"] = [r.to_dict() if hasattr(r, "to_dict") else r for r in self.results]
+        data["format_summaries"] = {
+            k: v.to_dict() if hasattr(v, "to_dict") else v
+            for k, v in self.format_summaries.items()
+        }
+        data["results"] = [
+            r.to_dict() if hasattr(r, "to_dict") else r
+            for r in self.results
+        ]
         return data

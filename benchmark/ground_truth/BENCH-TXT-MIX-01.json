@@ -1,0 +1,41 @@
+{
+  "fixture_id": "BENCH-TXT-MIX-01",
+  "filename": "BENCH-TXT-MIX-01.txt",
+  "format": "txt",
+  "category": "multilingual",
+  "scenario": "Mixed English, Bengali, and Banglish Q&A",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "Q: Order kivabe confirm korbo?\n\nA: Add to cart kore checkout korun. Cash on Delivery (COD) available ache.\n\nDhaka te 2 days er moddhe delivery hoye jabe.",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "paragraph",
+      "text": "Q: Order kivabe confirm korbo?"
+    },
+    {
+      "block_type": "paragraph",
+      "text": "A: Add to cart kore checkout korun. Cash on Delivery (COD) available ache."
+    },
+    {
+      "block_type": "paragraph",
+      "text": "Dhaka te 2 days er moddhe delivery hoye jabe."
+    }
+  ],
+  "expected_metadata": {
+    "encoding": "utf-8"
+  },
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

@@ -1,0 +1,42 @@
+{
+  "fixture_id": "BENCH-TXT-BOM-01",
+  "filename": "BENCH-TXT-BOM-01.txt",
+  "format": "txt",
+  "category": "encoding",
+  "scenario": "UTF-8 with Byte Order Mark (BOM)",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "Customer Support Policy\n\nOrders placed before 3:00 PM are processed same day.\n\nReturn requests are accepted within 7 business days.",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "paragraph",
+      "text": "Customer Support Policy"
+    },
+    {
+      "block_type": "paragraph",
+      "text": "Orders placed before 3:00 PM are processed same day."
+    },
+    {
+      "block_type": "paragraph",
+      "text": "Return requests are accepted within 7 business days."
+    }
+  ],
+  "expected_metadata": {
+    "encoding": "utf-8-sig",
+    "has_bom": true
+  },
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

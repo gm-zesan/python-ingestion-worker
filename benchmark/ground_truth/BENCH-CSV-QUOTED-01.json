@@ -1,0 +1,51 @@
+{
+  "fixture_id": "BENCH-CSV-QUOTED-01",
+  "filename": "BENCH-CSV-QUOTED-01.csv",
+  "format": "csv",
+  "category": "quoting",
+  "scenario": "Quoted CSV with internal commas and multiline cell content",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: BENCH-CSV-QUOTED-01.csv]\nID | Title | Description | Price\n-----------------------------------\n101 | Gaming Chair | Ergonomic, High-Back, Reclining | 180\n102 | Standing Desk | Adjustable height\nSolid bamboo top | 350",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "headers": [
+        "ID",
+        "Title",
+        "Description",
+        "Price"
+      ],
+      "rows": [
+        [
+          "101",
+          "Gaming Chair",
+          "Ergonomic, High-Back, Reclining",
+          "180"
+        ],
+        [
+          "102",
+          "Standing Desk",
+          "Adjustable height\nSolid bamboo top",
+          "350"
+        ]
+      ],
+      "row_count": 2
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

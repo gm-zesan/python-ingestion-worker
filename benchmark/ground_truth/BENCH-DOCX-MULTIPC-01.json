@@ -1,0 +1,41 @@
+{
+  "fixture_id": "BENCH-DOCX-MULTIPC-01",
+  "filename": "BENCH-DOCX-MULTIPC-01.docx",
+  "format": "docx",
+  "category": "tables",
+  "scenario": "Table with multiple paragraph elements inside individual cells",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "Field | Instructions\n-----------------------\nAddress | Line 1: Street Line 2: City",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "headers": [
+        "Field",
+        "Instructions"
+      ],
+      "rows": [
+        [
+          "Address",
+          "Line 1: Street Line 2: City"
+        ]
+      ],
+      "row_count": 1
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": "OpenXML fallback flattens intra-cell paragraphs into single-space delimited string"
+}

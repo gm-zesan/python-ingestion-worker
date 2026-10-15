@@ -1,0 +1,55 @@
+{
+  "fixture_id": "BENCH-CSV-AMBIGUOUS-01",
+  "filename": "BENCH-CSV-AMBIGUOUS-01.csv",
+  "format": "csv",
+  "category": "delimiters",
+  "scenario": "Ambiguous CSV containing conflicting delimiters causing sniffer uncertainty",
+  "expected_status": "needs_review",
+  "accepted_statuses": [
+    "needs_review"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [
+    "Dialect sniffer uncertain"
+  ],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: BENCH-CSV-AMBIGUOUS-01.csv]\ncolumn_1 | column_2 | column_3\n---------------------------------\nA,B,C |  | \nD | E | F\nG | H | I",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "headers": [
+        "column_1",
+        "column_2",
+        "column_3"
+      ],
+      "rows": [
+        [
+          "A,B,C",
+          "",
+          ""
+        ],
+        [
+          "D",
+          "E",
+          "F"
+        ],
+        [
+          "G",
+          "H",
+          "I"
+        ]
+      ],
+      "row_count": 3
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

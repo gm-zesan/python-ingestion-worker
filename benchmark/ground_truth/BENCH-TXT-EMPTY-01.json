@@ -1,0 +1,26 @@
+{
+  "fixture_id": "BENCH-TXT-EMPTY-01",
+  "filename": "BENCH-TXT-EMPTY-01.txt",
+  "format": "txt",
+  "category": "edge_cases",
+  "scenario": "Zero-byte empty text document",
+  "expected_status": "failed",
+  "accepted_statuses": [
+    "failed"
+  ],
+  "expected_error_code": "FILE_EMPTY",
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "",
+  "text_applicable": false,
+  "expected_blocks": [],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

@@ -1,0 +1,35 @@
+{
+  "fixture_id": "BENCH-TXT-CP1252-01",
+  "filename": "BENCH-TXT-CP1252-01.txt",
+  "format": "txt",
+  "category": "encoding",
+  "scenario": "Windows-1252 (CP1252) legacy encoding with smart quotes and em-dash",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "Special “quoted” term — café résumé legacy policy.\n\nAll contractual agreements remain binding.",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "paragraph",
+      "text": "Special “quoted” term — café résumé legacy policy."
+    },
+    {
+      "block_type": "paragraph",
+      "text": "All contractual agreements remain binding."
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

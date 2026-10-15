@@ -1,0 +1,65 @@
+{
+  "fixture_id": "BENCH-CSV-JAGGED-01",
+  "filename": "BENCH-CSV-JAGGED-01.csv",
+  "format": "csv",
+  "category": "edge_cases",
+  "scenario": "Jagged CSV with inconsistent column counts per row",
+  "expected_status": "needs_review",
+  "accepted_statuses": [
+    "needs_review"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [
+    "Inconsistent column counts"
+  ],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: BENCH-CSV-JAGGED-01.csv]\nH1 | H2 | H3 | H4\n--------------------\nA | B | C | D\nE | F |  | \nG | H | I | \nJ | K | L | M",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "headers": [
+        "H1",
+        "H2",
+        "H3",
+        "H4"
+      ],
+      "rows": [
+        [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        [
+          "E",
+          "F",
+          "",
+          ""
+        ],
+        [
+          "G",
+          "H",
+          "I",
+          ""
+        ],
+        [
+          "J",
+          "K",
+          "L",
+          "M"
+        ]
+      ],
+      "row_count": 4
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

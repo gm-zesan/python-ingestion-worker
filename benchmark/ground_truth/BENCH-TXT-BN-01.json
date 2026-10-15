@@ -1,0 +1,41 @@
+{
+  "fixture_id": "BENCH-TXT-BN-01",
+  "filename": "BENCH-TXT-BN-01.txt",
+  "format": "txt",
+  "category": "multilingual",
+  "scenario": "Bengali Unicode with ligatures, ZWJ/ZWNJ, and currency",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "ডেলিভারি পলিসি ও শর্তাবলী\n\nঢাকা সিটির ভিতরে র‍্যাপিড সার্ভিস চার্জ ৬০৳ এবং ২ কার্যদিবসের মধ্যে ডেলিভারি সম্পন্ন হবে।\n\nঅগ্রিম পেমেন্ট বিকাশ বা নগদ এর মাধ্যমে পরিশোধ করা যাবে (ক্‌ষ)।",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "paragraph",
+      "text": "ডেলিভারি পলিসি ও শর্তাবলী"
+    },
+    {
+      "block_type": "paragraph",
+      "text": "ঢাকা সিটির ভিতরে র‍্যাপিড সার্ভিস চার্জ ৬০৳ এবং ২ কার্যদিবসের মধ্যে ডেলিভারি সম্পন্ন হবে।"
+    },
+    {
+      "block_type": "paragraph",
+      "text": "অগ্রিম পেমেন্ট বিকাশ বা নগদ এর মাধ্যমে পরিশোধ করা যাবে (ক্‌ষ)।"
+    }
+  ],
+  "expected_metadata": {
+    "encoding": "utf-8"
+  },
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

@@ -1,0 +1,53 @@
+{
+  "fixture_id": "BENCH-CSV-COMMA-01",
+  "filename": "BENCH-CSV-COMMA-01.csv",
+  "format": "csv",
+  "category": "standard",
+  "scenario": "Standard comma-delimited English CSV",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: BENCH-CSV-COMMA-01.csv]\nSKU | Product | Price | Quantity\n-----------------------------------\nA101 | Desk Lamp | 15.99 | 10\nB202 | Office Chair | 89.50 | 4",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "headers": [
+        "SKU",
+        "Product",
+        "Price",
+        "Quantity"
+      ],
+      "rows": [
+        [
+          "A101",
+          "Desk Lamp",
+          "15.99",
+          "10"
+        ],
+        [
+          "B202",
+          "Office Chair",
+          "89.50",
+          "4"
+        ]
+      ],
+      "row_count": 2
+    }
+  ],
+  "expected_metadata": {
+    "delimiter": ","
+  },
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

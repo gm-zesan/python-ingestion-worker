@@ -1,0 +1,72 @@
+{
+  "fixture_id": "BENCH-DOCX-INTERLEAVE-01",
+  "filename": "BENCH-DOCX-INTERLEAVE-01.docx",
+  "format": "docx",
+  "category": "structure",
+  "scenario": "Sequential interleaving of headings, paragraphs, and multiple tables",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "Executive Summary\n\nOverview of preliminary quarter financials.\n\nMetric | Q1\n--------------------\nRevenue | 100k\n\nDetailed revenue distribution by source.\n\nChannel | Share\n--------------------\nOnline | 80%\n\nFinal outlook is positive.",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "heading",
+      "level": 1,
+      "text": "Executive Summary"
+    },
+    {
+      "block_type": "paragraph",
+      "text": "Overview of preliminary quarter financials."
+    },
+    {
+      "block_type": "table",
+      "headers": [
+        "Metric",
+        "Q1"
+      ],
+      "rows": [
+        [
+          "Revenue",
+          "100k"
+        ]
+      ],
+      "row_count": 1
+    },
+    {
+      "block_type": "paragraph",
+      "text": "Detailed revenue distribution by source."
+    },
+    {
+      "block_type": "table",
+      "headers": [
+        "Channel",
+        "Share"
+      ],
+      "rows": [
+        [
+          "Online",
+          "80%"
+        ]
+      ],
+      "row_count": 1
+    },
+    {
+      "block_type": "paragraph",
+      "text": "Final outlook is positive."
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

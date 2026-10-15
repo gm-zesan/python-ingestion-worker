@@ -1,0 +1,55 @@
+{
+  "fixture_id": "BENCH-DOCX-MULTITBL-01",
+  "filename": "BENCH-DOCX-MULTITBL-01.docx",
+  "format": "docx",
+  "category": "tables",
+  "scenario": "Multiple consecutive tables without intervening text",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "A | B\n--------------------\n1 | 2\n\nC | D\n--------------------\n3 | 4",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "headers": [
+        "A",
+        "B"
+      ],
+      "rows": [
+        [
+          "1",
+          "2"
+        ]
+      ],
+      "row_count": 1
+    },
+    {
+      "block_type": "table",
+      "headers": [
+        "C",
+        "D"
+      ],
+      "rows": [
+        [
+          "3",
+          "4"
+        ]
+      ],
+      "row_count": 1
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

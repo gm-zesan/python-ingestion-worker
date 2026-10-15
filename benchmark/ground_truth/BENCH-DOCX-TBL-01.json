@@ -1,0 +1,53 @@
+{
+  "fixture_id": "BENCH-DOCX-TBL-01",
+  "filename": "BENCH-DOCX-TBL-01.docx",
+  "format": "docx",
+  "category": "tables",
+  "scenario": "Heading followed by structured tabular matrix",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "Delivery Rates Overview\n\nZone | Charge | Duration\n---------------------------\nInside Dhaka | 60 BDT | 24-48 Hours\nOutside Dhaka | 130 BDT | 3-5 Days",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "heading",
+      "level": 1,
+      "text": "Delivery Rates Overview"
+    },
+    {
+      "block_type": "table",
+      "headers": [
+        "Zone",
+        "Charge",
+        "Duration"
+      ],
+      "rows": [
+        [
+          "Inside Dhaka",
+          "60 BDT",
+          "24-48 Hours"
+        ],
+        [
+          "Outside Dhaka",
+          "130 BDT",
+          "3-5 Days"
+        ]
+      ],
+      "row_count": 2
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

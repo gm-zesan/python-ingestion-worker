@@ -17,11 +17,14 @@ def normalize_for_evaluation(text: Optional[str]) -> str:
     Policy:
     - Normalizes Unicode to Canonical Composition (NFC).
     - Unifies carriage returns and newlines (\\r\\n and \\r -> \\n).
-    - Trims line-level trailing whitespace while preserving line structure.
+    - Trims line-level trailing whitespace while preserving leading indentation
+      and internal spacing.
     - Explicitly PRESERVES all Bengali script characters (U+0980..U+09FF)
       including Zero Width Joiner (ZWJ U+200D) and Zero Width Non-Joiner (ZWNJ U+200C).
+    - Trims leading and trailing empty lines from the document boundaries
+      while preserving internal paragraph breaks.
     """
-    if not text:
+    if text is None:
         return ""
 
     # 1. Unicode NFC
@@ -30,11 +33,16 @@ def normalize_for_evaluation(text: Optional[str]) -> str:
     # 2. Line ending unification
     normalized = normalized.replace("\r\n", "\n").replace("\r", "\n")
 
-    # 3. Strip trailing whitespace per line and overall boundaries
-    lines = [line.strip() for line in normalized.split("\n")]
-    
-    # Filter empty lines at edges while keeping paragraph breaks
-    return "\n".join(lines).strip()
+    # 3. Strip trailing whitespace per line without destroying leading indent/spaces
+    lines = [line.rstrip() for line in normalized.split("\n")]
+
+    # 4. Filter leading/trailing empty lines at document boundaries
+    while lines and not lines[0]:
+        lines.pop(0)
+    while lines and not lines[-1]:
+        lines.pop()
+
+    return "\n".join(lines)
 
 
 def calculate_levenshtein_distance(s1: str, s2: str) -> int:
@@ -75,7 +83,7 @@ def calculate_cer(extracted_text: str, ground_truth_text: str) -> Tuple[float, i
         return 0.0, 0
 
     if not norm_gt:
-        # Ground truth was empty but extracted text is not
+        # Ground truth was expected to be empty, but text was extracted
         return 1.0, len(norm_extracted)
 
     distance = calculate_levenshtein_distance(norm_extracted, norm_gt)
@@ -98,13 +106,18 @@ def evaluate_structural_correctness(
     """
     Compares extracted blocks with ground-truth expected blocks.
     Checks:
-    - Block types (heading, paragraph, table, worksheet)
-    - Heading levels (h1, h2, etc.)
-    - Table headers, row count, column count
+    - Block count and ordering
+    - Block types (heading, paragraph, table, worksheet, etc.)
+    - Block text content (normalized)
+    - Heading levels (h1, h2, h3, etc.)
+    - Table headers, row counts, and cell values
+    - Worksheet names and table captions
     Returns (is_match, score, list_of_mismatches).
     """
     if not expected_blocks:
-        return True, 1.0, []
+        if not actual_blocks:
+            return True, 1.0, []
+        return False, 0.0, [f"Expected 0 blocks, but extracted {len(actual_blocks)} blocks"]
 
     mismatches: List[str] = []
     total_checks = 0
@@ -132,6 +145,18 @@ def evaluate_structural_correctness(
         else:
             passed_checks += 1
 
+        # Check block text if explicitly specified in ground truth
+        if "text" in exp:
+            total_checks += 1
+            act_text_norm = normalize_for_evaluation(getattr(act, "text", ""))
+            exp_text_norm = normalize_for_evaluation(exp["text"])
+            if act_text_norm != exp_text_norm:
+                mismatches.append(
+                    f"Block [{i+1}] text mismatch: expected '{exp_text_norm[:40]}...', got '{act_text_norm[:40]}...'"
+                )
+            else:
+                passed_checks += 1
+
         # Check heading level
         if exp_type == "heading" and "level" in exp:
             total_checks += 1
@@ -141,13 +166,14 @@ def evaluate_structural_correctness(
             else:
                 passed_checks += 1
 
-        # Check table headers and dimensions
+        # Check table specifics
         if exp_type == "table":
             if "headers" in exp:
                 total_checks += 1
-                act_headers = getattr(act, "headers", [])
-                if act_headers != exp["headers"]:
-                    mismatches.append(f"Block [{i+1}] table headers mismatch: expected {exp['headers']}, got {act_headers}")
+                act_headers = [normalize_for_evaluation(h) for h in getattr(act, "headers", [])]
+                exp_headers = [normalize_for_evaluation(h) for h in exp["headers"]]
+                if act_headers != exp_headers:
+                    mismatches.append(f"Block [{i+1}] table headers mismatch: expected {exp_headers}, got {act_headers}")
                 else:
                     passed_checks += 1
 
@@ -159,6 +185,43 @@ def evaluate_structural_correctness(
                 else:
                     passed_checks += 1
 
+            if "rows" in exp:
+                total_checks += 1
+                act_rows = [[normalize_for_evaluation(c) for c in r] for r in getattr(act, "rows", [])]
+                exp_rows = [[normalize_for_evaluation(c) for c in r] for r in exp["rows"]]
+                if act_rows != exp_rows:
+                    mismatches.append(f"Block [{i+1}] table row cell values mismatch: expected {exp_rows}, got {act_rows}")
+                else:
+                    passed_checks += 1
+
+            if "caption" in exp:
+                total_checks += 1
+                act_caption = getattr(act, "caption", "") or ""
+                if normalize_for_evaluation(act_caption) != normalize_for_evaluation(exp["caption"]):
+                    mismatches.append(f"Block [{i+1}] table caption mismatch: expected '{exp['caption']}', got '{act_caption}'")
+                else:
+                    passed_checks += 1
+
+        # Check worksheet name / metadata
+        if "sheet_name" in exp:
+            total_checks += 1
+            act_sheet = act.metadata.get("sheet_name") if hasattr(act, "metadata") else None
+            if act_sheet != exp["sheet_name"]:
+                mismatches.append(f"Block [{i+1}] sheet name mismatch: expected '{exp['sheet_name']}', got '{act_sheet}'")
+            else:
+                passed_checks += 1
+
+    # Report excess or missing blocks
+    if len(actual_blocks) > len(expected_blocks):
+        for j in range(len(expected_blocks), len(actual_blocks)):
+            b = actual_blocks[j]
+            b_type = b.block_type.value if hasattr(b.block_type, "value") else str(b.block_type)
+            mismatches.append(f"Unexpected extra block [{j+1}]: type '{b_type}'")
+    elif len(actual_blocks) < len(expected_blocks):
+        for j in range(len(actual_blocks), len(expected_blocks)):
+            e = expected_blocks[j]
+            mismatches.append(f"Missing expected block [{j+1}]: type '{e.get('block_type')}'")
+
     structural_score = passed_checks / max(total_checks, 1)
     is_match = (len(mismatches) == 0)
     return is_match, structural_score, mismatches
@@ -168,9 +231,15 @@ def evaluate_warnings(
     actual_warnings: List[str],
     expected_warnings: List[str],
     forbidden_warnings: List[str],
+    expected_status: str,
 ) -> Tuple[bool, List[str], List[str]]:
     """
     Validates expected and forbidden warning substrings.
+    Policy:
+    - Expected warnings: every substring must appear case-insensitively in actual warnings.
+    - Forbidden warnings: no substring in forbidden_warnings may appear in actual warnings.
+    - Clean fixtures: if expected_status is 'success' and expected_warnings is empty,
+      any generated warning is flagged as unexpected unless explicitly accepted.
     """
     missing_warnings: List[str] = []
     forbidden_found: List[str] = []
@@ -182,8 +251,18 @@ def evaluate_warnings(
             missing_warnings.append(exp_w)
 
     for forb_w in forbidden_warnings:
-        if forb_w.lower() in actual_combined:
+        if forb_w == "*":
+            if actual_warnings:
+                forbidden_found.extend(actual_warnings)
+        elif forb_w.lower() in actual_combined:
             forbidden_found.append(forb_w)
+
+    # For strictly clean fixtures (expected clean success without warnings),
+    # ensure no unexpected warnings were generated
+    if expected_status == "success" and not expected_warnings and actual_warnings:
+        for w in actual_warnings:
+            if w not in forbidden_found:
+                forbidden_found.append(f"Unexpected warning in clean fixture: '{w}'")
 
     passed = (len(missing_warnings) == 0 and len(forbidden_found) == 0)
     return passed, missing_warnings, forbidden_found
@@ -215,63 +294,116 @@ def evaluate_fixture(
 ) -> FixtureEvaluationResult:
     """
     Performs full evaluation of an extraction result against ground truth.
+    Ensures:
+    - A failed extraction never silently passes unless explicitly expected.
+    - Negative fixtures have verified error codes.
+    - Inapplicable text metrics are reported as None rather than 1.0.
+    - Zero-length ground truth cannot conceal unexpected extracted text.
+    - Structural checks, warnings, and metadata are strictly verified.
     """
-    actual_status_str = result.status.value if hasattr(result.status, "value") else str(result.status)
-    status_match = actual_status_str in gt.accepted_statuses
+    failure_reasons: List[str] = []
 
+    # 1. Status comparison
+    actual_status_str = result.status.value if hasattr(result.status, "value") else str(result.status)
+    accepted_set = {s.value if hasattr(s, "value") else str(s) for s in gt.accepted_statuses}
+    status_match = actual_status_str in accepted_set
+
+    if not status_match:
+        failure_reasons.append(
+            f"Status mismatch: expected '{gt.expected_status}' (accepted: {sorted(accepted_set)}), got '{actual_status_str}'"
+        )
+
+    # 2. Error code comparison
     actual_error = result.error_code
     error_code_match = True
+
     if gt.expected_error_code is not None:
         error_code_match = (actual_error == gt.expected_error_code)
+        if not error_code_match:
+            failure_reasons.append(
+                f"Error code mismatch: expected '{gt.expected_error_code}', got '{actual_error}'"
+            )
+    elif gt.expected_status == "failed" or actual_status_str == "failed":
+        if gt.expected_status == "failed":
+            if not gt.allow_any_error_code:
+                # Ground truth defect: negative fixtures must explicitly define expected error code
+                error_code_match = False
+                failure_reasons.append(
+                    f"Negative fixture '{gt.fixture_id}' must explicitly specify expected_error_code"
+                )
+            elif not actual_error:
+                error_code_match = False
+                failure_reasons.append("Expected extraction failure with error code, but error_code was empty")
 
-    # Text accuracy (only relevant for non-empty ground truth)
-    cer = 0.0
-    car = 1.0
-    lev_dist = 0
-    if gt.expected_text:
+    # Inadvertent extraction failure defense:
+    # A failed extraction must not pass merely because text/structural checks were skipped
+    if actual_status_str == "failed" and "failed" not in accepted_set:
+        failure_reasons.append(
+            f"Extraction unexpectedly failed with error '{actual_error}': {result.error_message}"
+        )
+
+    # 3. Text Accuracy Evaluation (CER / CAR)
+    is_text_applicable = gt.text_applicable if gt.text_applicable is not None else (gt.expected_status != "failed")
+    cer: Optional[float] = None
+    car: Optional[float] = None
+    lev_dist: Optional[int] = None
+
+    if is_text_applicable:
         cer, lev_dist = calculate_cer(result.content, gt.expected_text)
         car = calculate_car(cer)
 
-    # Structural accuracy
+        thresholds = gt.provisional_thresholds
+        max_allowed_cer = thresholds.get("max_cer", 0.00)
+        min_allowed_car = thresholds.get("min_car", 1.00)
+
+        if cer > max_allowed_cer:
+            failure_reasons.append(
+                f"CER {cer:.4f} exceeds max allowed {max_allowed_cer:.4f} (edit distance: {lev_dist})"
+            )
+        if car < min_allowed_car:
+            failure_reasons.append(
+                f"CAR {car:.4f} is below min required {min_allowed_car:.4f}"
+            )
+    else:
+        # Prevent zero-length ground truth in failed/negative tests from concealing unexpected content
+        if result.content and actual_status_str != "failed":
+            failure_reasons.append(
+                f"Unexpected content extracted in non-text scenario: '{result.content[:50]}...'"
+            )
+
+    # 4. Structural Accuracy Evaluation
     structure_match, struct_score, struct_mismatches = evaluate_structural_correctness(
         result.blocks,
         gt.expected_blocks,
     )
 
-    # Warnings validation
+    if gt.expected_status != "failed" or gt.expected_blocks:
+        require_exact_struct = gt.provisional_thresholds.get("require_exact_structure", True)
+        if require_exact_struct and not structure_match:
+            failure_reasons.extend(struct_mismatches)
+
+    # 5. Warnings Validation
     warnings_passed, missing_warns, forbidden_warns = evaluate_warnings(
         result.warnings,
         gt.expected_warnings,
         gt.forbidden_warnings,
+        gt.expected_status,
     )
+    if not warnings_passed:
+        if missing_warns:
+            failure_reasons.append(f"Missing required warnings: {missing_warns}")
+        if forbidden_warns:
+            failure_reasons.append(f"Forbidden/unexpected warnings encountered: {forbidden_warns}")
 
-    # Metadata validation
+    # 6. Metadata Validation
     meta_match, meta_mismatches = evaluate_metadata(
         result.metadata,
         gt.expected_metadata,
     )
-
-    # Overall pass determination based on thresholds
-    thresholds = gt.provisional_thresholds
-    max_allowed_cer = thresholds.get("max_cer", 0.00)
-    min_allowed_car = thresholds.get("min_car", 1.00)
-    require_exact_struct = thresholds.get("require_exact_structure", True)
-
-    overall_passed = True
-    if not status_match:
-        overall_passed = False
-    if not error_code_match:
-        overall_passed = False
-    if not warnings_passed:
-        overall_passed = False
     if not meta_match:
-        overall_passed = False
+        failure_reasons.extend(meta_mismatches)
 
-    if gt.expected_status != "failed":
-        if cer > max_allowed_cer or car < min_allowed_car:
-            overall_passed = False
-        if require_exact_struct and not structure_match:
-            overall_passed = False
+    overall_passed = (len(failure_reasons) == 0)
 
     text_preview = (result.content[:100] + "...") if len(result.content) > 100 else result.content
     gt_preview = (gt.expected_text[:100] + "...") if len(gt.expected_text) > 100 else gt.expected_text
@@ -287,8 +419,9 @@ def evaluate_fixture(
         error_code_match=error_code_match,
         actual_error_code=actual_error,
         expected_error_code=gt.expected_error_code,
-        cer=round(cer, 4),
-        car=round(car, 4),
+        text_applicable=is_text_applicable,
+        cer=round(cer, 4) if cer is not None else None,
+        car=round(car, 4) if car is not None else None,
         levenshtein_distance=lev_dist,
         structure_match=structure_match,
         structural_score=round(struct_score, 4),
@@ -301,4 +434,5 @@ def evaluate_fixture(
         execution_time_ms=round(execution_time_ms, 2),
         extracted_text_preview=text_preview.replace("\n", " "),
         expected_text_preview=gt_preview.replace("\n", " "),
+        failure_reasons=failure_reasons,
     )

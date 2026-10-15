@@ -1,0 +1,58 @@
+{
+  "fixture_id": "BENCH-XLSX-EN-01",
+  "filename": "BENCH-XLSX-EN-01.xlsx",
+  "format": "xlsx",
+  "category": "standard",
+  "scenario": "Single worksheet product catalog in English",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: Sheet: Inventory]\nSKU | Item Name | Price | Stock\n----------------------------------\nSKU-101 | Wireless Mouse | 25.00 | 50\nSKU-102 | Mechanical Keyboard | 85.00 | 20",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "sheet_name": "Inventory",
+      "caption": "Sheet: Inventory",
+      "headers": [
+        "SKU",
+        "Item Name",
+        "Price",
+        "Stock"
+      ],
+      "rows": [
+        [
+          "SKU-101",
+          "Wireless Mouse",
+          "25.00",
+          "50"
+        ],
+        [
+          "SKU-102",
+          "Mechanical Keyboard",
+          "85.00",
+          "20"
+        ]
+      ],
+      "row_count": 2
+    }
+  ],
+  "expected_metadata": {
+    "sheet_names": [
+      "Inventory"
+    ],
+    "sheet_count": 1
+  },
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

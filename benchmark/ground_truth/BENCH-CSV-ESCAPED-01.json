@@ -1,0 +1,45 @@
+{
+  "fixture_id": "BENCH-CSV-ESCAPED-01",
+  "filename": "BENCH-CSV-ESCAPED-01.csv",
+  "format": "csv",
+  "category": "quoting",
+  "scenario": "CSV with escaped double quotes inside quoted fields",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: BENCH-CSV-ESCAPED-01.csv]\nItem | Notes\n--------------------\nMonitor | 27\" 4K \"Ultra\" Display\nKeypad | Custom \"Mechanical\" Switches",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "headers": [
+        "Item",
+        "Notes"
+      ],
+      "rows": [
+        [
+          "Monitor",
+          "27\" 4K \"Ultra\" Display"
+        ],
+        [
+          "Keypad",
+          "Custom \"Mechanical\" Switches"
+        ]
+      ],
+      "row_count": 2
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

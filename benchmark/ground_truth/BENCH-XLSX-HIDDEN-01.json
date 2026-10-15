@@ -1,0 +1,63 @@
+{
+  "fixture_id": "BENCH-XLSX-HIDDEN-01",
+  "filename": "BENCH-XLSX-HIDDEN-01.xlsx",
+  "format": "xlsx",
+  "category": "edge_cases",
+  "scenario": "Workbook containing a hidden worksheet",
+  "expected_status": "success_with_warnings",
+  "accepted_statuses": [
+    "success_with_warnings"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [
+    "is hidden in workbook"
+  ],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: Sheet: PublicNotes]\nTopic | Status\n--------------------\nLaunch | Ready\n\n[Table: Sheet: Internal_Costs]\nComponent | Budget\n---------------------\nHosting | 500",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "sheet_name": "PublicNotes",
+      "headers": [
+        "Topic",
+        "Status"
+      ],
+      "rows": [
+        [
+          "Launch",
+          "Ready"
+        ]
+      ],
+      "row_count": 1
+    },
+    {
+      "block_type": "table",
+      "sheet_name": "Internal_Costs",
+      "headers": [
+        "Component",
+        "Budget"
+      ],
+      "rows": [
+        [
+          "Hosting",
+          "500"
+        ]
+      ],
+      "row_count": 1
+    }
+  ],
+  "expected_metadata": {
+    "hidden_sheets": [
+      "Internal_Costs"
+    ]
+  },
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

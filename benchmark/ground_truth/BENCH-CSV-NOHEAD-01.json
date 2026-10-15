@@ -1,0 +1,55 @@
+{
+  "fixture_id": "BENCH-CSV-NOHEAD-01",
+  "filename": "BENCH-CSV-NOHEAD-01.csv",
+  "format": "csv",
+  "category": "structure",
+  "scenario": "Headerless numeric CSV requiring synthetic header generation",
+  "expected_status": "success_with_warnings",
+  "accepted_statuses": [
+    "success_with_warnings"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [
+    "generated synthetic column names"
+  ],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: BENCH-CSV-NOHEAD-01.csv]\ncolumn_1 | column_2 | column_3\n---------------------------------\n101 | 45.50 | 1\n102 | 99.00 | 2\n103 | 15.25 | 3",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "headers": [
+        "column_1",
+        "column_2",
+        "column_3"
+      ],
+      "rows": [
+        [
+          "101",
+          "45.50",
+          "1"
+        ],
+        [
+          "102",
+          "99.00",
+          "2"
+        ],
+        [
+          "103",
+          "15.25",
+          "3"
+        ]
+      ],
+      "row_count": 3
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

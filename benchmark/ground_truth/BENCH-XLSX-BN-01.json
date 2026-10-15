@@ -1,0 +1,57 @@
+{
+  "fixture_id": "BENCH-XLSX-BN-01",
+  "filename": "BENCH-XLSX-BN-01.xlsx",
+  "format": "xlsx",
+  "category": "multilingual",
+  "scenario": "Bengali product catalog spreadsheet with Bengali numerals and script",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: Sheet: পণ্য_তালিকা]\nআইডি | পণ্যের নাম | মূল্য | স্ট্যাটাস\n----------------------------------------\nP-01 | সুতি পাঞ্জাবি | ১২৫০ | ইন স্টক\nP-02 | সিল্ক শাড়ি | ৩৫০০ | স্টক শেষ",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "sheet_name": "পণ্য_তালিকা",
+      "caption": "Sheet: পণ্য_তালিকা",
+      "headers": [
+        "আইডি",
+        "পণ্যের নাম",
+        "মূল্য",
+        "স্ট্যাটাস"
+      ],
+      "rows": [
+        [
+          "P-01",
+          "সুতি পাঞ্জাবি",
+          "১২৫০",
+          "ইন স্টক"
+        ],
+        [
+          "P-02",
+          "সিল্ক শাড়ি",
+          "৩৫০০",
+          "স্টক শেষ"
+        ]
+      ],
+      "row_count": 2
+    }
+  ],
+  "expected_metadata": {
+    "sheet_names": [
+      "পণ্য_তালিকা"
+    ]
+  },
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

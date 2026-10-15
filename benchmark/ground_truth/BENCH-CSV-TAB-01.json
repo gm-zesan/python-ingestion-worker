@@ -1,0 +1,53 @@
+{
+  "fixture_id": "BENCH-CSV-TAB-01",
+  "filename": "BENCH-CSV-TAB-01.csv",
+  "format": "csv",
+  "category": "delimiters",
+  "scenario": "Tab-delimited TSV tabular dataset",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: BENCH-CSV-TAB-01.csv]\nItem_Code | Item_Name | Location | Units\n-------------------------------------------\nT-01 | Laptop Stand | Warehouse-A | 15\nT-02 | USB Cable | Warehouse-B | 100",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "headers": [
+        "Item_Code",
+        "Item_Name",
+        "Location",
+        "Units"
+      ],
+      "rows": [
+        [
+          "T-01",
+          "Laptop Stand",
+          "Warehouse-A",
+          "15"
+        ],
+        [
+          "T-02",
+          "USB Cable",
+          "Warehouse-B",
+          "100"
+        ]
+      ],
+      "row_count": 2
+    }
+  ],
+  "expected_metadata": {
+    "delimiter": "\t"
+  },
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

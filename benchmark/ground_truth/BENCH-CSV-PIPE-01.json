@@ -1,0 +1,53 @@
+{
+  "fixture_id": "BENCH-CSV-PIPE-01",
+  "filename": "BENCH-CSV-PIPE-01.csv",
+  "format": "csv",
+  "category": "delimiters",
+  "scenario": "Pipe-delimited enterprise log or inventory file",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: BENCH-CSV-PIPE-01.csv]\nService | Tier | Monthly_Fee | SLA_Hours\n-------------------------------------------\nCloud Backup | Standard | 29.99 | 24\nCloud Backup | Enterprise | 149.99 | 4",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "headers": [
+        "Service",
+        "Tier",
+        "Monthly_Fee",
+        "SLA_Hours"
+      ],
+      "rows": [
+        [
+          "Cloud Backup",
+          "Standard",
+          "29.99",
+          "24"
+        ],
+        [
+          "Cloud Backup",
+          "Enterprise",
+          "149.99",
+          "4"
+        ]
+      ],
+      "row_count": 2
+    }
+  ],
+  "expected_metadata": {
+    "delimiter": "|"
+  },
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

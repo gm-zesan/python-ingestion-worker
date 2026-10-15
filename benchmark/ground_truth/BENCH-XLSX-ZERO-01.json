@@ -1,0 +1,49 @@
+{
+  "fixture_id": "BENCH-XLSX-ZERO-01",
+  "filename": "BENCH-XLSX-ZERO-01.xlsx",
+  "format": "xlsx",
+  "category": "edge_cases",
+  "scenario": "Preservation of leading zeros in string phone and postal codes",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: Sheet: Customers]\nCustomer | Phone | PostalCode\n--------------------------------\nCustomer A | 01712345678 | 0800\nCustomer B | 01898765432 | 0120",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "sheet_name": "Customers",
+      "headers": [
+        "Customer",
+        "Phone",
+        "PostalCode"
+      ],
+      "rows": [
+        [
+          "Customer A",
+          "01712345678",
+          "0800"
+        ],
+        [
+          "Customer B",
+          "01898765432",
+          "0120"
+        ]
+      ],
+      "row_count": 2
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

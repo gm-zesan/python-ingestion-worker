@@ -1,0 +1,63 @@
+{
+  "fixture_id": "BENCH-XLSX-MULTI-01",
+  "filename": "BENCH-XLSX-MULTI-01.xlsx",
+  "format": "xlsx",
+  "category": "structure",
+  "scenario": "Multi-sheet workbook preserving inter-sheet ordering",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: Sheet: Catalog]\nCode | Title\n--------------------\nC-1 | T-Shirt\n\n[Table: Sheet: Shipping]\nZone | Cost\n--------------------\nMetro | 60",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "sheet_name": "Catalog",
+      "headers": [
+        "Code",
+        "Title"
+      ],
+      "rows": [
+        [
+          "C-1",
+          "T-Shirt"
+        ]
+      ],
+      "row_count": 1
+    },
+    {
+      "block_type": "table",
+      "sheet_name": "Shipping",
+      "headers": [
+        "Zone",
+        "Cost"
+      ],
+      "rows": [
+        [
+          "Metro",
+          "60"
+        ]
+      ],
+      "row_count": 1
+    }
+  ],
+  "expected_metadata": {
+    "sheet_names": [
+      "Catalog",
+      "Shipping"
+    ],
+    "sheet_count": 2
+  },
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

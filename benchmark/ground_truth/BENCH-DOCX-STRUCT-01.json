@@ -1,0 +1,54 @@
+{
+  "fixture_id": "BENCH-DOCX-STRUCT-01",
+  "filename": "BENCH-DOCX-STRUCT-01.docx",
+  "format": "docx",
+  "category": "structure",
+  "scenario": "Deep heading hierarchy (H1 -> H2 -> H3) with intervening text",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "Section 1: General Information\n\nIntroductory overview paragraph.\n\nSection 1.1: Eligibility Criteria\n\nDetailed criteria guidelines.\n\nSection 1.1.1: Verification Steps\n\nFinal step-by-step checklist.",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "heading",
+      "level": 1,
+      "text": "Section 1: General Information"
+    },
+    {
+      "block_type": "paragraph",
+      "text": "Introductory overview paragraph."
+    },
+    {
+      "block_type": "heading",
+      "level": 2,
+      "text": "Section 1.1: Eligibility Criteria"
+    },
+    {
+      "block_type": "paragraph",
+      "text": "Detailed criteria guidelines."
+    },
+    {
+      "block_type": "heading",
+      "level": 3,
+      "text": "Section 1.1.1: Verification Steps"
+    },
+    {
+      "block_type": "paragraph",
+      "text": "Final step-by-step checklist."
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

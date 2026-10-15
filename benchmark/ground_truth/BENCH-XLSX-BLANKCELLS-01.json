@@ -1,0 +1,49 @@
+{
+  "fixture_id": "BENCH-XLSX-BLANKCELLS-01",
+  "filename": "BENCH-XLSX-BLANKCELLS-01.xlsx",
+  "format": "xlsx",
+  "category": "structure",
+  "scenario": "Worksheet containing interspersed empty/blank cells within rows",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "[Table: Sheet: SparseData]\nColA | ColB | ColC\n---------------------\nValA1 |  | ValC1\n | ValB2 | ",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "table",
+      "sheet_name": "SparseData",
+      "headers": [
+        "ColA",
+        "ColB",
+        "ColC"
+      ],
+      "rows": [
+        [
+          "ValA1",
+          "",
+          "ValC1"
+        ],
+        [
+          "",
+          "ValB2",
+          ""
+        ]
+      ],
+      "row_count": 2
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

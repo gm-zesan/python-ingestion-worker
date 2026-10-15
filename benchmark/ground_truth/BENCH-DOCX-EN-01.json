@@ -1,0 +1,45 @@
+{
+  "fixture_id": "BENCH-DOCX-EN-01",
+  "filename": "BENCH-DOCX-EN-01.docx",
+  "format": "docx",
+  "category": "standard",
+  "scenario": "Standard English DOCX with headings and body paragraphs",
+  "expected_status": "success",
+  "accepted_statuses": [
+    "success"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [],
+  "forbidden_warnings": [],
+  "expected_text": "Store Operations Guide\n\nOur fulfillment center operates seven days a week.\n\nShipping Windows\n\nOrders placed before 2:00 PM ship on the same calendar day.",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "heading",
+      "level": 1,
+      "text": "Store Operations Guide"
+    },
+    {
+      "block_type": "paragraph",
+      "text": "Our fulfillment center operates seven days a week."
+    },
+    {
+      "block_type": "heading",
+      "level": 2,
+      "text": "Shipping Windows"
+    },
+    {
+      "block_type": "paragraph",
+      "text": "Orders placed before 2:00 PM ship on the same calendar day."
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}

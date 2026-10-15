@@ -1,0 +1,38 @@
+{
+  "fixture_id": "BENCH-TXT-MOJIBAKE-01",
+  "filename": "BENCH-TXT-MOJIBAKE-01.txt",
+  "format": "txt",
+  "category": "edge_cases",
+  "scenario": "Text document with excessive replacement characters triggering needs_review",
+  "expected_status": "needs_review",
+  "accepted_statuses": [
+    "needs_review"
+  ],
+  "expected_error_code": null,
+  "allow_any_error_code": false,
+  "expected_warnings": [
+    "mojibake"
+  ],
+  "forbidden_warnings": [],
+  "expected_text": "Primary English header.\n\n������������������������������\n\nTrailing valid paragraph text.",
+  "text_applicable": true,
+  "expected_blocks": [
+    {
+      "block_type": "paragraph"
+    },
+    {
+      "block_type": "paragraph"
+    },
+    {
+      "block_type": "paragraph"
+    }
+  ],
+  "expected_metadata": {},
+  "provisional_thresholds": {
+    "max_cer": 0.0,
+    "min_car": 1.0,
+    "require_exact_structure": true
+  },
+  "threshold_rationale": null,
+  "known_unsupported_content": null
+}
